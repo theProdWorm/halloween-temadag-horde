@@ -1,33 +1,65 @@
 class Sprite {
-    constructor(x, y, width, aspectRatio, speed) {
+    constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
 
         this.width = width;
-        this.height = width * aspectRatio;
+        this.height = height;
 
         this.speed = speed;
     }
 
-    sprite = new Image();
+    image = new Image();
 
     draw() {
         if (this.flipX) {
             gameArea.save();
             gameArea.scale(-1, 1);
-            gameArea.drawImage(this.sprite, this.x * -1 - this.width, this.y, this.width, this.height);
+            gameArea.drawImage(this.image, this.x * -1 - this.width, this.y, this.width, this.height);
             gameArea.restore();
-        } else gameArea.drawImage(this.sprite, this.x, this.y, this.width, this.height);
+        } else gameArea.drawImage(this.image, this.x, this.y, this.width, this.height);
     }
 
-    deltaCollision = false;
     moveAndCollide(x, y, other = null) {
         this.x += x;
         this.y += y;
 
-        this.flipX = x < 0;
+        if (x != 0) this.flipX = x < 0;
 
-        if (other !== null && other !== 'undefined') collide(this, other);
+        // Detect collision
+        if (other !== null && other !== 'undefined') {
+            if (this.x < other.x + other.width &&
+                this.x + this.width > other.x &&
+                this.y < other.y + other.height &&
+                this.y + this.height > other.y) {
+
+                if (!this.collided) {
+                    // Collision detected
+                    console.log("Collision detected");
+                    this.collided = true;
+                }
+            } else this.collided = false;
+        }
+    }
+
+    follow(obj, offsetX = 0, offsetY = 0) {
+        this.flipX = obj.flipX;
+
+        this.x = obj.x + obj.width / 2 + offsetX * (this.flipX ? -1 : 0.05);
+        this.y = obj.y + obj.height / 2 + offsetY;
+    }
+}
+
+class Gun extends Sprite {
+    shoot() {
+        var offset = 5;
+        var x = this.x;
+        var y = this.y;
+        var width = 32;
+        var height = 32;
+        const bullet = new Sprite(x + width / 2, y + offset, width, height);
+        bullet.image.src = 'sprites/bullet/bullet.png';
+        bullets.push(bullet);
     }
 }
 
@@ -39,14 +71,14 @@ class AnimatedSprite extends Sprite {
         this.loopTimer = 0;
         this.loopDelay = loopDelay;
         this.currentFrame = 0;
-        this.sprite = animation[0];
+        this.image = animation[0];
     }
     playAnimation() {
         this.loopTimer--;
 
         if (this.loopTimer <= 0) {
             this.currentFrame = this.currentFrame + 1 >= this.animation.length ? 0 : this.currentFrame + 1;
-            this.sprite = this.animation[this.currentFrame];
+            this.image = this.animation[this.currentFrame];
 
             this.loopTimer = this.loopDelay;
         }
@@ -76,6 +108,7 @@ class Player extends AnimatedSprite {
 }
 
 class Zombie extends AnimatedSprite {
+    collided = false;
     chase() {
         var distX = player.x - this.x;
         var distY = player.y - this.y;
@@ -101,11 +134,10 @@ const animationCollection = {
 const canvas = document.createElement('canvas');
 const gameArea = canvas.getContext('2d');
 
-// Create the player element
-const player = new Player(900, 400, 100, 1.24, 5);
+const player = new Player(900, 400, 100, 124, 5);
+const gun = new Gun(player.x + player.width / 2, player.y + player.height / 2, 50, 30, 0);
+const bullets = [];
 const zombies = [];
-// const zombie = new Zombie(0, 0, 100, 1.24, 0.5);
-// zombies.push(zombie);
 const input = {
     moveUp: false,
     moveRight: false,
@@ -121,11 +153,14 @@ window.onload = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    gameArea.scale(0.8, 0.8);
+
     player.setAnimation(animationCollection.playerIdle, 3);
+
+    gun.image.src = 'sprites/gun/gun.png';
 
     setInterval(spawnZombie, 1000);
 
-    // player.animate(animationCollection.debug, 60);
     setInterval(update, 1000 / 60); // Start updating the game
 }
 
@@ -163,30 +198,29 @@ document.addEventListener('keyup', function(event) {
     if (event.keyCode == 68) { // D
         input.moveRight = false;
     }
+    if (event.keyCode == 32) {
+        gun.shoot();
+    }
 });
 
 function update() {
-    gameArea.clearRect(0, 0, canvas.width, canvas.height);
+    gameArea.clearRect(0, 0, canvas.width / 0.8, canvas.height / 0.8);
 
-    for (let i = 0; i < zombies.length; i++) {
-        zombies[i].playAnimation();
-        zombies[i].chase();
-    }
+    zombies.forEach(zombie => {
+        zombie.playAnimation();
+        zombie.chase();
+    });
 
-    player.playAnimation();
     player.moveInput();
-}
+    player.playAnimation();
 
-function collide(rect1, rect2) {
-    if (rect1.x < rect2.x + rect2.width &&
-        rect1.x + rect1.width > rect2.x &&
-        rect1.y < rect2.y + rect2.height &&
-        rect1.y + rect1.height > rect2.y) {
+    gun.follow(player, 50, 15);
+    gun.draw();
 
-        // Collision detected
-        console.log("Collision detected");
-        rect1.deltaCollision = true;
-    }
+    bullets.forEach(bullet => {
+        // bullet.moveAndCollide()
+        bullet.draw();
+    });
 }
 
 function createAnimation(folder, name, frames) {
@@ -196,39 +230,35 @@ function createAnimation(folder, name, frames) {
         image.src = `sprites/${folder}/${name} (${i + 1}).png`;
         animation.push(image);
     }
-
     return animation;
 }
 
 function spawnZombie() {
     var width = 100;
-    var aspectRatio = 1.24;
-    var height = width * aspectRatio;
-    var randomX = Math.floor(Math.random() * 2);
-    // var y = Math.floor(Math.random() * canvas.height);
+    var height = 124;
+    var accesspoint = Math.floor((Math.random() * 4) + 1);
     var y;
     var x;
-    var accesspoint = Math.floor((Math.random() * 4) + 1);
 
     switch (accesspoint) {
         case 1:
-            x = Math.floor(Math.random() * canvas.width)
+            x = Math.floor(Math.random() * canvas.width / 0.8)
             y = -height;
             break;
         case 2:
             x = -width;
-            y = Math.floor(Math.random() * canvas.height + height);
+            y = Math.floor(Math.random() * canvas.height / 0.8 + height);
             break;
         case 3:
-            x = Math.floor(Math.random() * canvas.width);
-            y = canvas.height + height;
+            x = Math.floor(Math.random() * canvas.width / 0.8);
+            y = canvas.height / 0.8 + height;
             break;
         case 4:
-            x = canvas.width + width;
-            y = Math.floor(Math.random() * canvas.height);
+            x = canvas.width / 0.8 + width;
+            y = Math.floor(Math.random() * canvas.height / 0.8);
             break;
     }
-    const zombie = new Zombie(x, y, width, aspectRatio, 2)
+    const zombie = new Zombie(x, y, width, height, 2)
     zombies.push(zombie);
     zombie.setAnimation(animationCollection.zombieWalk, 4);
 }
