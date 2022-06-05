@@ -28,12 +28,16 @@ export default class Sprite {
 
         if (x != 0) this.flipX = x < 0;
 
+        if (other != null) this.checkForCollision(other);
+    }
+
+    checkForCollision(collider) {
         // Detect collision
-        if (other !== null && other !== 'undefined') {
-            if (this.x < other.x + other.width &&
-                this.x + this.width > other.x &&
-                this.y < other.y + other.height &&
-                this.y + this.height > other.y) {
+        if (collider !== null && collider !== 'undefined') {
+            if (this.x < collider.x + collider.width &&
+                this.x + this.width > collider.x &&
+                this.y < collider.y + collider.height &&
+                this.y + this.height > collider.y) {
 
                 if (!this.collided) {
                     // Collision detected

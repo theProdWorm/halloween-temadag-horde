@@ -41,4 +41,12 @@ export function setupInput() {
             console.log("pew pew");
         }
     });
+
+    document.addEventListener('mousemove', function(event) {
+        let distY = event.clientY - gun.y;
+        let distX = event.clientX - gun.x;
+        gun.angle = Math.atan2(distY, distX);
+        // console.log(distY, distX);
+        // console.log(angle);
+    })
 }

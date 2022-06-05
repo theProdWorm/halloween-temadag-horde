@@ -72,6 +72,7 @@ function update() {
 
     bullets.forEach(bullet => {
         // bullet.moveAndCollide()
+        bullet.move();
         bullet.draw();
     });
 }
