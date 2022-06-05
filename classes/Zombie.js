@@ -4,12 +4,12 @@ import { player } from '../Game.js';
 export default class Zombie extends AnimatedSprite {
     collided = false;
     chase() {
-        var distX = player.x - this.x;
-        var distY = player.y - this.y;
-        var rad = Math.atan2(distY, distX);
+        let distX = player.x - this.x;
+        let distY = player.y - this.y;
+        let rad = Math.atan2(distY, distX);
 
-        var x = Math.cos(rad);
-        var y = Math.sin(rad);
+        let x = Math.cos(rad);
+        let y = Math.sin(rad);
 
         this.moveAndCollide(x, y, player);
     }

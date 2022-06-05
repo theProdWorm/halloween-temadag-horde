@@ -29,6 +29,7 @@ export function setupInput() {
         if (event.key == 'd') { // D
             input.moveRight = false;
         }
+
         if (event.key == ' ') {
             gun.shoot();
 

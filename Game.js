@@ -52,6 +52,8 @@ window.onload = () => {
 window.onresize = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    gameArea.scale(0.8, 0.8);
 }
 
 setupInput();

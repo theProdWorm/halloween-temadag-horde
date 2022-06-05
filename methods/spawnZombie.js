@@ -2,11 +2,11 @@ import Zombie from '../classes/Zombie.js';
 import { canvas, zombies, animationCollection } from '../Game.js';
 
 export function spawnZombie() {
-    var width = 100;
-    var height = 124;
-    var accesspoint = Math.floor((Math.random() * 4) + 1);
-    var y;
-    var x;
+    let width = 100;
+    let height = 124;
+    let accesspoint = Math.floor((Math.random() * 4) + 1);
+    let y;
+    let x;
 
     switch (accesspoint) {
         case 1:
