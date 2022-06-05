@@ -44,8 +44,6 @@ window.onload = () => {
 
     gun.image.src = 'sprites/gun/gun.png';
 
-    setInterval(spawnZombie, 1000);
-
     setInterval(update, 1000 / 60); // Start updating the game
 }
 

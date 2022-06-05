@@ -1,4 +1,5 @@
 import { input, gun } from '../Game.js';
+import { spawnZombie } from '../methods/spawnZombie.js';
 
 export function setupInput() {
     document.addEventListener('keydown', function(event) {
@@ -13,6 +14,10 @@ export function setupInput() {
         }
         if (event.key == 'd') { // D
             input.moveRight = true;
+        }
+
+        if (event.key == 'p') {
+            setInterval(spawnZombie, 1000);
         }
     });
 
