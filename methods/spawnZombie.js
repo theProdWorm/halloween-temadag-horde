@@ -26,7 +26,7 @@ export function spawnZombie() {
             y = Math.floor(Math.random() * canvas.height / 0.8);
             break;
     }
-    const zombie = new Zombie(x, y, width, height, 2)
+    const zombie = new Zombie(x, y, width, height, 2, zombies.length);
     zombies.push(zombie);
     zombie.setAnimation(animationCollection.zombieWalk, 4);
 }

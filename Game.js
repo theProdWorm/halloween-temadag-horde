@@ -4,7 +4,6 @@ import Player from './classes/Player.js';
 import { setupInput } from './setup/input.js';
 
 import { createAnimation } from './methods/createAnimation.js';
-import { spawnZombie } from './methods/spawnZombie.js';
 
 export const animationCollection = {
     zombieAttack: createAnimation('zombie', 'Attack', 8),

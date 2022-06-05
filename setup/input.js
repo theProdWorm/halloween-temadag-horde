@@ -1,4 +1,4 @@
-import { input, gun } from '../Game.js';
+import { input, zombies } from '../Game.js';
 import { spawnZombie } from '../methods/spawnZombie.js';
 
 export function setupInput() {
@@ -36,9 +36,9 @@ export function setupInput() {
         }
 
         if (event.key == ' ') {
-            gun.shoot();
-
-            console.log("pew pew");
+            zombies.forEach(zombie => {
+                zombie.die();
+            });
         }
     });
 }
