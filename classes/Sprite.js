@@ -1,3 +1,5 @@
+import { gameArea } from '../Game.js';
+
 export default class Sprite {
     constructor(x, y, width, height, speed) {
         this.x = x;

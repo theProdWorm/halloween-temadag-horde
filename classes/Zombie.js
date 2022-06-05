@@ -1,4 +1,5 @@
 import AnimatedSprite from './AnimatedSprite.js';
+import { player } from '../Game.js';
 
 export default class Zombie extends AnimatedSprite {
     collided = false;

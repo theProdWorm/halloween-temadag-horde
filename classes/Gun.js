@@ -1,4 +1,5 @@
 import Sprite from './Sprite.js';
+import { bullets } from '../Game.js';
 
 export default class Gun extends Sprite {
     shoot() {
